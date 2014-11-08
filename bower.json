@@ -1,0 +1,27 @@
+{
+  "name": "bootboxwiz",
+  "main": "bootboxwiz.js",
+  "version": "0.0.0",
+  "homepage": "https://github.com/jamesjenner/bootboxwiz",
+  "authors": [
+    "James Jenner <james.g.jenner@gmail.com>"
+  ],
+  "description": "An extension of bootboxjs that provides a dynamic or fixed wizard",
+  "keywords": [
+    "Wizard",
+    "Bootbox",
+    "Javascript"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootbox": "~4.3.0",
+    "jquery-serialize-object": "git://github.com/macek/jquery-serialize-object.git#~2.4.3"
+  }
+}
