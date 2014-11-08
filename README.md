@@ -9,7 +9,7 @@ Quick Start
 
 - [Download the latest release](https://github.com/jamesjenner/bootboxwizard/dist/bootboxwizard.min.js)
 - Clone the repository: `git clone https://github.com/jamesjenner/bootboxwizard.git`
-- Install with Bower: [Bower](http://bower.io): `bower install bootboxwiz`
+- Install with [Bower](http://bower.io): `bower install bootboxwiz`
 
 Example
 ----
