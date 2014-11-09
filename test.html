@@ -279,9 +279,6 @@ $(document).ready(function () {
   }
   
   function step2Logic(fields) {
-    console.log("step2Logic(): ");
-    console.log(fields);
-                    
     var paymentType = ((fields.paymentType !== null && fields.paymentType !== undefined) ? fields.paymentType : 'Paypal');
     
     switch(paymentType) {
