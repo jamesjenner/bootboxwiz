@@ -1,4 +1,6 @@
-this['bootBoxWiz'] = {};
+/*global bootbox,$ */
+// this['bootBoxWiz'] = {};
+this.bootBoxWiz = {};
     
 BootBoxWiz.TYPE_DYNAMIC = "dynamic";
 BootBoxWiz.TYPE_FIXED = "fixed";
@@ -23,6 +25,10 @@ function BootBoxWiz(options) {
   this.currentStep = 1;
 }
 
+BootBoxWiz.prototype.__defaultStepFunction = function() {
+  return 0;
+};
+
 BootBoxWiz.prototype.launch = function() {
   var messageContent = '';
   var i;
@@ -35,7 +41,7 @@ BootBoxWiz.prototype.launch = function() {
       '    <line x1="0" y1="25" x2="1000" y2="25" style="stroke:darkgray; stroke-width:1" />';
     
     for(i = 0; i < this.nbrSteps; i++) {
-      this.stepLogic[i] = function () { return 0};
+      this.stepLogic[i] = this.__defaultStepFunction;
       this.stepContentSize[i] = 1;
       messageContent += 
         '    <circle id="' + this.stepBaseId + 'StepInd' + i + '" cx="' + ((xFreq / 2) + (xFreq * i)) + '" cy="25" r="20" stroke="darkgray" stroke-width="1" fill="white" />' +
@@ -58,7 +64,7 @@ BootBoxWiz.prototype.launch = function() {
       if(this.stepContent[i].content !== null && this.stepContent[i].content !== undefined) {
         if(this.stepContent[i].content instanceof Array) {
           // this.nbrSteps += this.stepContent[i].content.length - 1;
-          this.stepLogic[i] = ((this.stepContent[i].logic !== null && this.stepContent[i].logic) ? this.stepContent[i].logic : function () { return 0});
+          this.stepLogic[i] = ((this.stepContent[i].logic !== null && this.stepContent[i].logic) ? this.stepContent[i].logic : this.__defaultStepFunction);
           this.stepContentSize[i] = this.stepContent[i].content.length;
           
           for(var j = 0; j < this.stepContent[i].content.length; j++) {
@@ -68,7 +74,7 @@ BootBoxWiz.prototype.launch = function() {
               '      </div>';
           }
         } else {
-          this.stepLogic[i] = function () { return 0};
+          this.stepLogic[i] = this.__defaultStepFunction;
           this.stepContentSize[i] = 1;
           messageContent += 
             '      <div class="row ' + this.stepBaseId + 'wizardContent" id="' + this.stepBaseId + 'Content' + (currentId++) + '">' +
@@ -141,7 +147,7 @@ BootBoxWiz.prototype.launch = function() {
     this._setPreviousDisabled(true);
     this._setFinishDisabled(true);
   }.bind(this));
-}
+};
 
 BootBoxWiz.prototype.nextStep = function() {
   this.currentWizPanelStep++;
@@ -159,7 +165,7 @@ BootBoxWiz.prototype.nextStep = function() {
   }
 
   return false;
-}
+};
 
 BootBoxWiz.prototype.previousStep = function() {
   this.currentWizPanelStep--;
@@ -177,18 +183,18 @@ BootBoxWiz.prototype.previousStep = function() {
   }
 
   return false;
-}
+};
 
 BootBoxWiz.prototype._hideAllSteps = function() {
   $('.' + this.stepBaseId + 'wizardContent').hide();
-}
+};
 
 BootBoxWiz.prototype._hideWizPanel = function(counter) {
   $('#' + this.stepBaseId + 'Content' + counter).hide();
   $('#' + this.stepBaseId + 'StepInd' + counter).attr("fill", "white");
   $('#' + this.stepBaseId + 'StepInd' + counter).attr("stroke", "darkgray");
   $('#' + this.stepBaseId + 'StepIndText' + counter).attr("fill", "lightgray");
-}
+};
 
 BootBoxWiz.prototype._showWizPanel = function(counter) {
   $('#' + this.stepBaseId + 'Content' + counter).show();
@@ -196,41 +202,35 @@ BootBoxWiz.prototype._showWizPanel = function(counter) {
   $('#' + this.stepBaseId + 'StepInd' + counter).attr("stroke", "#428bca");
   $('#' + this.stepBaseId + 'StepIndText' + counter).attr("fill", "white");
   $('#title').focus();
-}
+};
 
 BootBoxWiz.prototype._applyContentOffsets = function(step) {
-  // Using https://github.com/macek/jquery-serialize-object to serialize to an object
+  // using https://github.com/macek/jquery-serialize-object to serialize to an object
   var stepOffset = this.stepLogic[this.currentWizPanelStep]($('.stepwizard .form-horizontal').serializeObject());
   
   // iterate through previous steps and apply size
   var previousStepsOffset = 0;
   
-  // this.stepContentSize[i]
   for(var i = 0; i < this.currentWizPanelStep; i++) {
     previousStepsOffset += this.stepContentSize[i] - 1;
   }
   
-  this.currentWizPanel = previousStepsOffset + this.currentWizPanelStep + stepOffset
-  
-  console.log("stepOffset: " + stepOffset);
-  console.log("this.currentWizPanel: " + this.currentWizPanel);
-  
-  // return stepOffset;
-}
+  this.currentWizPanel = previousStepsOffset + this.currentWizPanelStep + stepOffset;
+};
 
 
 BootBoxWiz.prototype._setPreviousDisabled = function(disable) {
   this._getBootBoxButton('previous').prop('disabled', disable);
-}
+};
 
 BootBoxWiz.prototype._setNextDisabled = function(disable) {
   this._getBootBoxButton('next').prop('disabled', disable);
-}
+};
 
 BootBoxWiz.prototype._setFinishDisabled = function(disable) {
   this._getBootBoxButton('finish').prop('disabled', disable);
-}
+};
 
 BootBoxWiz.prototype._getBootBoxButton = function(label) {
   return $(".bootbox").find('button[data-bb-handler="' + label + '"]');
-}
+};
