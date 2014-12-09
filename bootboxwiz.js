@@ -20,6 +20,7 @@ function BootBoxWiz(options) {
   
   this.nbrSteps = this.stepContent.length;
   this.stepLogic = [];
+  this.preProcessingLogic = [];
   this.stepContentSize = [];
   
   this.currentStep = 1;
@@ -42,6 +43,7 @@ BootBoxWiz.prototype.launch = function() {
     
     for(i = 0; i < this.nbrSteps; i++) {
       this.stepLogic[i] = this.__defaultStepFunction;
+      this.preProcessingLogic[i] = function(){};
       this.stepContentSize[i] = 1;
       messageContent += 
         '    <circle id="' + this.stepBaseId + 'StepInd' + i + '" cx="' + ((xFreq / 2) + (xFreq * i)) + '" cy="25" r="20" stroke="darkgray" stroke-width="1" fill="white" />' +
@@ -62,6 +64,8 @@ BootBoxWiz.prototype.launch = function() {
   for(i = 0; i < this.stepContent.length; i++) {
     if(this.stepContent[i] instanceof Object) {
       if(this.stepContent[i].content !== null && this.stepContent[i].content !== undefined) {
+        this.preProcessingLogic[i] = ((this.stepContent[i].preProcessingLogic !== null && this.stepContent[i].preProcessingLogic) ? this.stepContent[i].preProcessingLogic : function(){});
+        
         if(this.stepContent[i].content instanceof Array) {
           // this.nbrSteps += this.stepContent[i].content.length - 1;
           this.stepLogic[i] = ((this.stepContent[i].logic !== null && this.stepContent[i].logic) ? this.stepContent[i].logic : this.__defaultStepFunction);
@@ -83,6 +87,7 @@ BootBoxWiz.prototype.launch = function() {
         }
       }
     } else {
+      this.preProcessingLogic[i] = function(){};
       messageContent += 
         '      <div class="row ' + this.stepBaseId + 'wizardContent" id="' + this.stepBaseId + 'Content' + (currentId++) + '">' +
         this.stepContent[i] +
@@ -152,6 +157,7 @@ BootBoxWiz.prototype.launch = function() {
 BootBoxWiz.prototype.nextStep = function() {
   this.currentWizPanelStep++;
   this._hideWizPanel(this.currentWizPanel);
+  this._applyPreProcessing();
   this._applyContentOffsets();
   this._showWizPanel(this.currentWizPanel);
 
@@ -204,7 +210,11 @@ BootBoxWiz.prototype._showWizPanel = function(counter) {
   $('#title').focus();
 };
 
-BootBoxWiz.prototype._applyContentOffsets = function(step) {
+BootBoxWiz.prototype._applyPreProcessing = function() {
+  this.preProcessingLogic[this.currentWizPanelStep]($('.stepwizard .form-horizontal').serializeObject());
+};
+
+BootBoxWiz.prototype._applyContentOffsets = function() {
   // using https://github.com/macek/jquery-serialize-object to serialize to an object
   var stepOffset = this.stepLogic[this.currentWizPanelStep]($('.stepwizard .form-horizontal').serializeObject());
   

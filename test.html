@@ -264,6 +264,7 @@ $(document).ready(function () {
       {
         type: BootBoxWiz.TYPE_FIXED,
         title: "Step 3",
+        preProcessingLogic: step3PreProcessLogic,
         content: 
         '<div class="col-xs-12">' +
         '  <label class="col-md-4 control-label" for="feedback">Feedback?</label> ' +
@@ -300,6 +301,10 @@ $(document).ready(function () {
     }
                     
     return 0;
+  }
+  
+  function step3PreProcessLogic(fields) {
+    alert("pre process logic for step 3");
   }
   
 });
