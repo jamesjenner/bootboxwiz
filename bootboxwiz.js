@@ -12,7 +12,8 @@ function BootBoxWiz(options) {
 
   this.title = ((options.title !== null && options.title !== undefined) ? options.title : 'Wizard');
 
-  
+  this.id = ((options.id !== null && options.id !== undefined) ? options.id : options.title.replace(/\W/g, ''));
+
   this.stepBaseId = ((options.stepBaseId !== null && options.stepBaseId !== undefined) ? options.stepBaseId : 'wizard');
   this.stepContent = ((options.stepContent !== null && options.stepContent !== undefined) ? options.stepContent : ['']);
   
@@ -30,6 +31,9 @@ BootBoxWiz.prototype.__defaultStepFunction = function() {
   return 0;
 };
 
+BootBoxWiz.prototype._doNothing = function() {
+};
+
 BootBoxWiz.prototype.launch = function() {
   var messageContent = '';
   var i;
@@ -43,7 +47,7 @@ BootBoxWiz.prototype.launch = function() {
     
     for(i = 0; i < this.nbrSteps; i++) {
       this.stepLogic[i] = this.__defaultStepFunction;
-      this.preProcessingLogic[i] = function(){};
+      this.preProcessingLogic[i] = this._doNothing;
       this.stepContentSize[i] = 1;
       messageContent += 
         '    <circle id="' + this.stepBaseId + 'StepInd' + i + '" cx="' + ((xFreq / 2) + (xFreq * i)) + '" cy="25" r="20" stroke="darkgray" stroke-width="1" fill="white" />' +
@@ -58,13 +62,13 @@ BootBoxWiz.prototype.launch = function() {
   messageContent += 
     '<div class="stepwizard row">  ' +
     '  <div class="col-md-12"> ' +
-    '    <form class="form-horizontal"> ';
+    '    <form id="' + this.id + '" class="form-horizontal"> ';
   
   var currentId = 0;
   for(i = 0; i < this.stepContent.length; i++) {
     if(this.stepContent[i] instanceof Object) {
       if(this.stepContent[i].content !== null && this.stepContent[i].content !== undefined) {
-        this.preProcessingLogic[i] = ((this.stepContent[i].preProcessingLogic !== null && this.stepContent[i].preProcessingLogic) ? this.stepContent[i].preProcessingLogic : function(){});
+        this.preProcessingLogic[i] = ((this.stepContent[i].preProcessingLogic !== null && this.stepContent[i].preProcessingLogic) ? this.stepContent[i].preProcessingLogic : this._doNothing);
         
         if(this.stepContent[i].content instanceof Array) {
           // this.nbrSteps += this.stepContent[i].content.length - 1;
@@ -87,7 +91,7 @@ BootBoxWiz.prototype.launch = function() {
         }
       }
     } else {
-      this.preProcessingLogic[i] = function(){};
+      this.preProcessingLogic[i] = this._doNothing;
       messageContent += 
         '      <div class="row ' + this.stepBaseId + 'wizardContent" id="' + this.stepBaseId + 'Content' + (currentId++) + '">' +
         this.stepContent[i] +
@@ -211,12 +215,16 @@ BootBoxWiz.prototype._showWizPanel = function(counter) {
 };
 
 BootBoxWiz.prototype._applyPreProcessing = function() {
-  this.preProcessingLogic[this.currentWizPanelStep]($('.stepwizard .form-horizontal').serializeObject());
+  this.preProcessingLogic[this.currentWizPanelStep](this.getSerializedForm());
+};
+
+BootBoxWiz.prototype.getSerializedForm = function() {
+  return $('#' + this.id).serializeObject();
 };
 
 BootBoxWiz.prototype._applyContentOffsets = function() {
   // using https://github.com/macek/jquery-serialize-object to serialize to an object
-  var stepOffset = this.stepLogic[this.currentWizPanelStep]($('.stepwizard .form-horizontal').serializeObject());
+  var stepOffset = this.stepLogic[this.currentWizPanelStep](this.getSerializedForm());
   
   // iterate through previous steps and apply size
   var previousStepsOffset = 0;
